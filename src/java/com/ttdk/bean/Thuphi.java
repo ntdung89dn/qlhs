@@ -307,7 +307,7 @@ public class Thuphi {
                         "inner join tbl_dontp on tbl_dontp.DTP_ID = tbl_dondatp.DTP_ID "+joinSql
                     + " where 1=1" + whereSql
                             + " group by tbl_dontp.DTP_TDV,tbl_dontp.DTP_TDVDC order by tbl_dontp.DTP_TDV desc;";
-        System.out.println(sql);
+        //System.out.println(sql);
         connect = new DBConnect().dbConnect();
         //String table = "";
         try {
@@ -3826,7 +3826,7 @@ public class Thuphi {
             Logger.getLogger(Thuphi.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             try {
-                new DBConnect().closeAll(null, pstm, rs);
+                new DBConnect().closePSRS(pstm, rs);
             } catch (SQLException ex) {
                 Logger.getLogger(ThongKe.class.getName()).log(Level.SEVERE, null, ex);
             }

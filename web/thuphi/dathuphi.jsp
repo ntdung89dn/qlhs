@@ -881,8 +881,8 @@
                                exportByBBD();
                            }
                        }else if(typeExport ==='3'){
-                        //   exportAll();
-                        alert("Chức năng chưa được cập nhật");
+                           exportAll();
+                       // alert("Chức năng chưa được cập nhật");
                        }else if(typeExport === '4'){
                            exportDonThuPhi();
                        }
