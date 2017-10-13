@@ -1,0 +1,80 @@
+html, body, ul, li {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+body {
+    color: #333333;
+    font-family: "Times New Roman",Times,serif;
+    font-size: 13px;
+    font-weight: normal;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+}
+.wrapper {
+    margin: 0 auto;
+    min-height: 650px;
+    text-align: left;
+    width: 650px;
+}
+.header {
+    height: 210px;
+    position: relative;
+    width: 650px;
+    z-index: 2;
+}
+
+.top_header{
+    height: 150px;
+    width: 650px;
+    z-index: 2;
+}
+
+.top_header_left{
+    float:left;
+	height: 100px;
+	width: 220px;
+	text-align:center;
+}
+
+.top_header_right{
+    float:right;
+	height: 100px;
+	width: 280px;
+	text-align:center;
+}
+
+.content_header{
+    float:right;
+	height: 50px;
+	width: 650px;
+	text-align:center;
+}
+
+.bottom_header{
+    float:right;
+	height: 50px;
+	width: 650px;
+	text-align:left;
+}
+
+.content{
+	text-align:center;
+}
+
+.qpSend a{
+	background:url('../../images/btmSend.jpg') no-repeat;
+	width:71px;
+	height:30px;
+	display:block;
+	line-height:30px;
+	text-decoration:none;
+	text-align:center;
+	color:#fff;
+	display:block;
+	float:left;
+}
+.qpSend a:hover{
+	background:url('../../images/btmSendH.jpg') no-repeat;
+}

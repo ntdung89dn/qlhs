@@ -1,0 +1,188 @@
+html, body, ul, li {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+body {
+    color: #333333;
+    font-family: "Times New Roman",Times,serif;
+    font-size: 12px;
+    font-weight: normal;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+}
+.wrapper {
+    margin: 0 auto;
+    min-height: 650px;
+    text-align: left;
+    width: 650px;
+	padding-left: 28px;
+}
+.header {
+    height: 100px;
+    position: relative;
+    width: 650px;
+    z-index: 2;
+}
+.content {
+    clear: both;
+    width: 650px;
+}
+.content .sec_wrapper1 {
+    clear: both;
+    height: 65px;
+    position: relative;
+    width: 650px;
+}
+.content .sec_wrapper1 .line1 {
+    font-size: 16px;
+    position: absolute;
+    width: 112px;
+}
+.content .sec_wrapper1 .point1 {
+    height: 15px;
+    position: absolute;
+    right: -8px;
+    top: -5px;
+    width: 545px;
+}
+.content .sec_wrapper1 .line2 {
+    font-size: 16px;
+    position: absolute;
+    top: 25px;
+    width: 55px;
+}
+.content .sec_wrapper1 .point2 {
+    height: 15px;
+    position: absolute;
+    right: -3px;
+    top: 20px;
+    width: 600px;
+}
+.content .sec_wrapper1 .line3 {
+    font-size: 16px;
+    position: absolute;
+    top: 50px;
+    width: 75px;
+}
+.content .sec_wrapper1 .point3 {
+    height: 15px;
+    position: absolute;
+    right: -3px;
+    top: 45px;
+    width: 580px;
+}
+.content .sec_wrapper1 .point4 {
+    height: 15px;
+    position: absolute;
+    right: 0;
+    top: 70px;
+    width: 650px;
+}
+.content .sec_wrapper1 .point5 {
+    height: 15px;
+    position: absolute;
+    right: 0;
+    top: 90px;
+    width: 650px;
+}
+.content .sec_wrapper1 .line5 {
+    font-size: 16px;
+    position: absolute;
+    top: 115px;
+    width: 50px;
+}
+.content .sec_wrapper1 .point6 {
+    height: 15px;
+    left: 51px;
+    position: absolute;
+    top: 120px;
+    width: 143px;
+}
+.content .sec_wrapper1 .line6 {
+    font-size: 16px;
+    position: absolute;
+    right: 340px;
+    top: 115px;
+    width: 115px;
+}
+.content .sec_wrapper1 .point7 {
+    height: 15px;
+    position: absolute;
+    right: -25px;
+    top: 120px;
+    width: 350px;
+}
+.content .sec_wrapper1 .point8 {
+    height: 15px;
+    position: absolute;
+    right: 0;
+    top: 140px;
+    width: 650px;
+}
+.content .sec_wrapper1 .line7 {
+    font-size: 16px;
+    position: absolute;
+    top: 165px;
+    width: 140px;
+}
+.content .sec_wrapper1 .point9 {
+    height: 15px;
+    position: absolute;
+    right: -20px;
+    top: 170px;
+    width: 515px;
+}
+.content .sec_wrapper1 .line8 {
+    font-size: 16px;
+    position: absolute;
+    text-align: right;
+    top: 190px;
+    width: 350px;
+}
+.content .sec_wrapper1 .point10 {
+    height: 15px;
+    left: 443px;
+    position: absolute;
+    text-align: center;
+    top: 194px;
+    width: 30px;
+}
+.content .sec_wrapper1 .line9 {
+    font-size: 16px;
+    position: absolute;
+    right: 225px;
+    top: 190px;
+    width: 35px;
+}
+.content .sec_wrapper1 .point11 {
+    height: 15px;
+    left: 508px;
+    position: absolute;
+    text-align: center;
+    top: 194px;
+    width: 30px;
+}
+.content .sec_wrapper1 .line10 {
+    font-size: 16px;
+    position: absolute;
+    right: 135px;
+    top: 197px;
+    width: 55px;
+}
+.content .sec_wrapper1 .point12 {
+    height: 15px;
+    left: 568px;
+    position: absolute;
+    text-align: center;
+    top: 194px;
+    width: 30px;
+}
+.content .sec_wrapper1 .point13 {
+    height: 15px;
+    left: 430px;
+    position: absolute;
+    top: 288px;
+    width: 200px;
+}
