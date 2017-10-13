@@ -946,9 +946,9 @@ public class ThuPhiServlet extends HttpServlet {
             if(bnbd == null){
                 bnbd = "";
             }
-            
-            ArrayList<ArrayList<String>> bnbdList = tp.loadBTP(fromday, today, loaihinhnhan, manhan, loaidk, sohieu,bnbd);
-            HSSFWorkbook workbook = new ThuPhiExcel().exportThuPhiExcelAll(bnbdList, "TỔNG HỢP THU PHÍ", fromday, today, sohieu);
+            String bbd = "";
+            String donids  = tp.getInforDTPByDon(bbd, manhan, loaihinhnhan);
+            HSSFWorkbook workbook = new ThuPhiExcel().exportThuPhiExcelAll(donids, "TỔNG HỢP THU PHÍ", fromday, today, sohieu,bnbd);
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-Disposition", "attachment; filename=bbd_thuphi.xls");
             OutputStream out = response.getOutputStream();

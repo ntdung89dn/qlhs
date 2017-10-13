@@ -465,7 +465,7 @@ public class ThuPhiExcel {
     }
     
      // tạo excel thu phi đầy đủ
-    public HSSFWorkbook exportThuPhiExcelAll(ArrayList<ArrayList<String>>  data,String title,String fromday,String today,String sohieus){
+    public HSSFWorkbook exportThuPhiExcelAll(String donids,String title,String fromday,String today,String sohieus,String bnp){
             HSSFWorkbook workbook = new HSSFWorkbook();
             HSSFSheet sheet = workbook.createSheet(title);
           //  Map<String, Object[]> data = getTHCN( ngaybatdau, ngayketthuc);
@@ -495,165 +495,46 @@ public class ThuPhiExcel {
             createCell(rowTD, 9,false, 3, 4, 2, 2, sheet,"TỔNG TIỀN",true,workbook);
             int rownum = 4;
             int stt = 1;
-            Connection connect = new DBConnect().dbConnect();
+            ArrayList<ArrayList<String>> data = tp.getInforDTPforExcel(fromday, today, sohieus, bnp, donids);
             for(ArrayList<String> tbp : data){
                 Row rowNV = sheet.createRow(rownum);
+//                dt.add(tendonvi);dt.add(diachi);dt.add(total);dt.add(sohieurs);
+//                dt.add(tbpday);
                 String name = tbp.get(0);
                 String diachi = tbp.get(1);
-                String dtpids = tbp.get(2);
-                if(dtpids.length() >1023){
-                    dtpids = tp.loadDTPIDS(fromday, today, name, diachi,sohieus);
+                String total = tbp.get(2);
+                String sohieu = tbp.get(3);
+                String tbpday = tbp.get(4);
+                int tbpid = Integer.parseInt(tbp.get(5));
+                ArrayList<ArrayList<String>> donList = tp.getInforDonByTBPID(tbpid);
+                int lastRow = 0;
+                boolean mergeCell = false;
+                if(donList.size() >1){
+                    lastRow = rownum + donList.size()-1;
+                    mergeCell = true;
                 }
-                ArrayList<ArrayList<String>> sohieuList = tp.loadDTPInfor(dtpids, connect);
-           //     System.out.println(tongtien);
-                int numMerger = rownum;
-                if(sohieuList.size() >1){
-                    String sohieu = "",tongtien = "",ngaytp = "",donids = "";
-                    for(int i=0; i< sohieuList.size();i++){
-                        Row rowSH = null;
-                        if(i==0){
-                            rowSH = rowNV;
-                        }else{
-                            rowSH = sheet.createRow((rownum+i));
-                        }
-                        
-                        if(!sohieuList.isEmpty()){
-                            sohieu = sohieuList.get(i).get(1);
-                            tongtien = sohieuList.get(i).get(2);
-                            ngaytp =  sohieuList.get(i).get(3);
-                            donids = sohieuList.get(i).get(4);
-                            if(donids.length() >1023){
-                                donids = tp.loadDTPIDS(fromday, today, name, diachi, sohieu);
-                            }
-                        }
-                        int countHS =rownum;
-                        if(donids.split(",").length >1){
-                            int rowlastKH = rownum+ donids.split(",").length;
-                         //   countHS = countHS+donids.split(",").length-1;
-                         //   countHS += rowsoHieu;
-                            createCell(rowSH, 3,true, countHS, rowlastKH, 3, 3, sheet,sohieu,false,workbook);
-                            createCell(rowSH, 4,true, countHS, rowlastKH, 4, 4, sheet,ngaytp,false,workbook);
-                            for(int j =0;j<donids.split(",").length;j++){
-                                Row rowDon = null;
-                                if(i==0){
-                                    rowDon = rowSH;
-                                }else{
-                                    rowDon = sheet.createRow((countHS+i));
-                                }
-                                ArrayList<String> donInfor = tp.loadDonByID(Integer.parseInt(donids.split(",")[j]), connect);
-                                String mdo = donInfor.get(0);
-                                String ngaynhap = donInfor.get(3);
-                                String giatien = donInfor.get(1);
-                                String PL = donInfor.get(2);
-                                String benbaodam  = tp.loadBBDDon(Integer.parseInt(donids.split(",")[j]),connect) + PL;
-                                createCell(rowDon, 5,false, 3, 4, 2, 2, sheet,ngaynhap,false,workbook);
-                                createCell(rowDon, 6,false, 3, 4, 2, 2, sheet,mdo,false,workbook);
-                                createCell(rowDon, 7,false, 3, 4, 2, 2, sheet,benbaodam,false,workbook);
-                                createCell(rowDon, 8,false, 3, 4, 2, 2, sheet,giatien,false,workbook);
-                            }
-                            createCell(rowSH, 9,true,countHS, rowlastKH, 9, 9, sheet,tongtien,false,workbook);
-                        }else{
-                            Row rowDon = rowSH;
-                            ArrayList<String> donInfor = tp.loadDonByID(Integer.parseInt(donids), connect);
-                            String mdo = donInfor.get(0);
-                            String ngaynhap = donInfor.get(3);
-                            String giatien = donInfor.get(1);
-                            String PL = donInfor.get(2);
-                            String benbaodam  = tp.loadBBDDon(Integer.parseInt(donids),connect) + PL;
-                            createCell(rowSH, 3,false, countHS, countHS, 1, 1, sheet,sohieu,false,workbook);
-                            createCell(rowSH, 4,false, countHS, countHS, 2, 2, sheet,ngaytp,false,workbook);
-                            createCell(rowDon, 5,false, 3, 4, 2, 2, sheet,ngaynhap,false,workbook);
-                            createCell(rowDon, 6,false, 3, 4, 2, 2, sheet,mdo,false,workbook);
-                            createCell(rowDon, 7,false, 3, 4, 2, 2, sheet,benbaodam,false,workbook);
-                            createCell(rowDon, 8,false, 3, 4, 2, 2, sheet,giatien,false,workbook);
-                            createCell(rowSH, 9,false,3, 4, 9, 9, sheet,tongtien,false,workbook);
-                        }
-                        countHS += donids.split(",").length;
-                        numMerger += countHS+1;
-//                        createCell(rowSH, 3,false, 3, 4, 0, 0, sheet,sohieu,false,workbook);
-//                        createCell(rowSH, 4,false, 3, 4, 0, 0, sheet,ngaytp,false,workbook);
-//                        createCell(rowSH, 5,false, 3, 4, 1, 1, sheet,tongtien,false,workbook);
-                    }
-                    createCell(rowNV, 0,true, rownum, numMerger, 0, 0, sheet,"+stt",false,workbook);
-                    createCell(rowNV, 1,true, rownum, numMerger, 0, 0, sheet,name,false,workbook);
-                    createCell(rowNV, 2,true, rownum, numMerger, 0, 0, sheet,diachi,false,workbook);
-                    rownum += numMerger+1;
-                }else{
-                    
-                    String sohieu = "",tongtien = "",ngaytp = "",donids = "";
-                    if(!sohieuList.isEmpty()){
-                        sohieu = sohieuList.get(0).get(1);
-                        tongtien = sohieuList.get(0).get(2);
-                        ngaytp = sohieuList.get(0).get(3);
-                        donids = sohieuList.get(0).get(4);
-                        if(donids.length() >1023){
-                            donids = tp.loadDTPIDS(fromday, today, name, diachi, sohieu);
-                        }
-                        createCell(rowNV, 3,false, 3, 4, 2, 2, sheet,sohieu,false,workbook); 
-                        createCell(rowNV, 4,false, 3, 4, 2, 2, sheet,ngaytp,false,workbook);
-                        if(donids.split(",").length >1){
-                            for(int k =0;k < donids.split(",").length;k++){
-                                Row rowDon = null;
-                                    if(k==0){
-                                        rowDon = rowNV;
-                                    }else{
-                                        rowDon = sheet.createRow((rownum+k));
-                                    }
-                                ArrayList<String> donInfor = tp.loadDonByID(Integer.parseInt(donids.split(",")[k]), connect);
-                                String mdo = donInfor.get(0);
-                                String ngaynhap = donInfor.get(3);
-                                String giatien = donInfor.get(1);
-                                String PL = donInfor.get(2);
-                                String benbaodam  = tp.loadBBDDon(Integer.parseInt(donids.split(",")[k]),connect) + PL;
-                                createCell(rowDon, 5,false, 3, 4, 2, 2, sheet,ngaynhap,false,workbook);
-                                createCell(rowDon, 6,false, 3, 4, 2, 2, sheet,mdo,false,workbook);
-                                createCell(rowDon, 7,false, 3, 4, 2, 2, sheet,benbaodam,false,workbook);
-                                createCell(rowDon, 8,false, 3, 4, 2, 2, sheet,giatien,false,workbook);
-
-                            }
-                            createCell(rowNV, 0,true, rownum,rownum+ (donids.split(",").length-1), 0, 0, sheet,""+stt,false,workbook);
-                            createCell(rowNV, 1,true, rownum,rownum+ (donids.split(",").length -1), 1, 1, sheet,name,false,workbook);
-                            createCell(rowNV, 2,true, rownum,rownum+ (donids.split(",").length -1), 2, 2, sheet,diachi,false,workbook);
-                            createCell(rowNV, 9,true,rownum,rownum+ (donids.split(",").length -1 ), 9, 9, sheet,tongtien,false,workbook);
-                            rownum += donids.split(",").length+1;
-                        }else{
-                            ArrayList<String> donInfor = tp.loadDonByID(Integer.parseInt(donids), connect);
-                            String mdo = donInfor.get(0);
-                            String ngaynhap = donInfor.get(3);
-                            String giatien = donInfor.get(1);
-                            String PL = donInfor.get(2);
-                            String benbaodam  = tp.loadBBDDon(Integer.parseInt(donids),connect) + PL;
-                            createCell(rowNV, 5,false, 3, 4, 2, 2, sheet,ngaynhap,false,workbook);
-                            createCell(rowNV, 6,false, 3, 4, 2, 2, sheet,mdo,false,workbook);
-                            createCell(rowNV, 7,false, 3, 4, 2, 2, sheet,benbaodam,false,workbook);
-                            createCell(rowNV, 8,false, 3, 4, 2, 2, sheet,giatien,false,workbook);
-                            createCell(rowNV, 0,false, rownum,rownum+ (donids.split(",").length-1), 0, 0, sheet,""+stt,false,workbook);
-                            createCell(rowNV, 1,false, rownum,rownum+ (donids.split(",").length-1), 1, 1, sheet,name,false,workbook);
-                            createCell(rowNV, 2,false, rownum,rownum+ (donids.split(",").length-1), 1, 1, sheet,diachi,false,workbook);
-                            createCell(rowNV, 9,false,rownum,rownum+ (donids.split(",").length-1), 9, 9, sheet,tongtien,false,workbook);
-                            rownum += donids.split(",").length;
-                        }
-                        
+                createCell(rowNV, 0,mergeCell, rownum,lastRow, 0, 0, sheet,stt,false,workbook);
+                createCell(rowNV, 1,mergeCell, rownum,  lastRow, 1, 1, sheet,name,false,workbook);
+                createCell(rowNV, 2,mergeCell, rownum,lastRow, 2, 2, sheet,diachi,false,workbook);
+                createCell(rowNV, 3,mergeCell, rownum,lastRow, 3, 3, sheet,sohieu,false,workbook);
+                createCell(rowNV, 4,mergeCell, rownum, lastRow, 4, 4, sheet,tbpday,false,workbook);
+                createCell(rowNV, 9,mergeCell, rownum,lastRow, 9, 9, sheet,total,false,workbook);
+                for(int i = 0; i < donList.size();i++){
+                    Row rowSub ;
+                    if(i==0){
+                        rowSub = rowNV;
                     }else{
-                        createCell(rowNV, 3,false, 3, 4, 2, 2, sheet,"",false,workbook); 
-                        createCell(rowNV, 4,false, 3, 4, 2, 2, sheet,"",false,workbook);
-                        createCell(rowNV, 5,false, 3, 4, 2, 2, sheet,"",false,workbook);
-                        createCell(rowNV, 6,false, 3, 4, 2, 2, sheet,"",false,workbook);
-                        createCell(rowNV, 7,false, 3, 4, 2, 2, sheet,"",false,workbook);
-                        createCell(rowNV, 8,false, 3, 4, 2, 2, sheet,"",false,workbook);
-                        createCell(rowNV, 9,false,3, 4, 9, 9, sheet,"",false,workbook);
+                        rowSub = sheet.createRow(rownum);
                     }
-                    
+                    createCell(rowSub, 5,false, 3, 4, 1, 1, sheet,donList.get(i).get(0),false,workbook);
+                    createCell(rowSub, 6,false, 3, 4, 1, 1, sheet,donList.get(i).get(1),false,workbook);
+                    createCell(rowSub, 7,false, 3, 4, 3, 3, sheet,donList.get(i).get(2),false,workbook);
+                    createCell(rowSub, 8,false, 3, 4, 3, 3, sheet,donList.get(i).get(3),false,workbook);
+                    rownum++;
                 }
-
-                rownum = rownum + sohieuList.size();
                 stt++;
             }
-             try {
-                    new DBConnect().closeAll(connect, null, null);
-                } catch (SQLException ex) {
-                    Logger.getLogger(ThuPhiExcel.class.getName()).log(Level.SEVERE, null, ex);
-                }
+             
         return workbook;
     }
     

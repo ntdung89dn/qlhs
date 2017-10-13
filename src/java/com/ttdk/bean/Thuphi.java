@@ -307,7 +307,7 @@ public class Thuphi {
                         "inner join tbl_dontp on tbl_dontp.DTP_ID = tbl_dondatp.DTP_ID "+joinSql
                     + " where 1=1" + whereSql
                             + " group by tbl_dontp.DTP_TDV,tbl_dontp.DTP_TDVDC order by tbl_dontp.DTP_TDV desc;";
-        //System.out.println(sql);
+        System.out.println(sql);
         connect = new DBConnect().dbConnect();
         //String table = "";
         try {
@@ -4503,5 +4503,148 @@ public class Thuphi {
             option += "<option value='"+dt.get(0)+"' >"+dt.get(1)+"</option>";
         }
         return option;
+    }
+    
+    // search don da thu phi theo don
+    public String getInforDTPByDon(String bbd, String manhan,int loaihinhnhan){
+        String whereSql = "",donids = "";
+        if(!bbd.equals("")){
+            whereSql += " and  tbl_don.D_ID in ((select tbl_benbaodam.D_ID from tbl_benbaodam where tbl_benbaodam.BDB_Name like '%"+bbd+"%')) ";
+        }
+        
+        if(!manhan.equals("")){
+            whereSql += " and tbl_don.D_manhan like '%"+manhan+"%' ";
+        }
+        if(loaihinhnhan != 0){
+            whereSql += " and tbl_don.LN_ID = "+loaihinhnhan+ " ";
+        }
+        if(!whereSql.equals("")){
+            String sql = "select tbl_don.D_ID from tbl_dondatp \n" +
+                            "inner join tbl_don on tbl_don.D_ID = tbl_dondatp.D_ID\n" +
+                            "where "+whereSql + ";";
+            connect = new DBConnect().dbConnect();
+            try {
+                pstm = connect.prepareStatement(sql);
+                rs= pstm.executeQuery();
+                while(rs.next()){
+                    if(donids.equals("")){
+                        donids  = rs.getString(1);
+                    }else{
+                        donids += ","+rs.getString(1);
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(Thuphi.class.getName()).log(Level.SEVERE, null, ex);
+            }finally{
+                try {
+                    new DBConnect().closeAll(connect, pstm, rs);
+                } catch (SQLException ex) {
+                    Logger.getLogger(ThongKe.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return donids;
+    }
+    //public load infor cho excel da thu phi all
+    public ArrayList<ArrayList<String>> getInforDTPforExcel(String ngaybatdau,String ngayketthuc,String sohieu,String bennopphi,String donids){
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        String whereSql = "";
+         if(!ngaybatdau.trim().equals("")){
+             whereSql += " and tbl_dontp.DTP_Date >= STR_TO_DATE('"+ngaybatdau+"','%d-%m-%Y') ";
+         }
+         if(!ngayketthuc.trim().equals("")){
+             whereSql += " and tbl_dontp.DTP_Date <= STR_TO_DATE('"+ngayketthuc+"','%d-%m-%Y') ";
+         }
+         if(!sohieu.trim().equals("")){
+             String[] sohieus = sohieu.split(",");
+            if(sohieus.length >1){
+                whereSql += " and tbl_dontp.DTP_Sohieu in("+sohieu+")";
+            }else{
+                whereSql += " and tbl_dontp.DTP_Sohieu like '%"+sohieu+"%'";
+            }
+         }
+         if(!donids.equals("")){
+             whereSql += " and tbl_dondatp.D_ID in("+donids+") ";
+         }
+         if(!bennopphi.equals("")){
+             whereSql += " and tbl_dontp.DTP_TDV like '%"+bennopphi+"%'";
+         }
+        String sql = "select tbl_dontp.DTP_ID as tbpid, tbl_dontp.DTP_TDV as bnp ,tbl_dontp.DTP_TDVDC as diachi,tbl_dontp.DTP_Total as total,\n" +
+                        "tbl_dontp.DTP_Sohieu as sohieu, \n" +
+                        "DATE_FORMAT(tbl_dontp.DTP_Date,'%d-%m-%Y') as tbpdate\n" +
+                        "from tbl_dondatp \n" +
+                        "inner join tbl_dontp on tbl_dontp.DTP_ID = tbl_dondatp.DTP_ID  \n" +
+                        " where 1=1 "+whereSql+
+                        " group by tbl_dontp.DTP_ID;";
+        //System.out.println(sql);
+        connect = new DBConnect().dbConnect();
+        //String table = "";
+        try {
+            pstm = connect.prepareStatement(sql);
+            rs = pstm.executeQuery();
+            while(rs.next()){
+                ArrayList<String> dt = new ArrayList<>();
+                String tendonvi = rs.getString("bnp");
+                String diachi = rs.getString("diachi");
+                String total = rs.getString("total");
+                String sohieurs = rs.getString("sohieu");
+                String tbpday  =  rs.getString("tbpdate");
+                String tbpids= rs.getString("tbpid");
+                dt.add(tendonvi);dt.add(diachi);dt.add(total);dt.add(sohieurs);
+                dt.add(tbpday);dt.add(tbpids);
+                data.add(dt);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Thuphi.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            try {
+                new DBConnect().closeAll(connect, pstm, rs);
+            } catch (SQLException ex) {
+                Logger.getLogger(ThongKe.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return data;
+    }
+    
+    // load thong tin don by tbpid
+    // lấy đơn đã nộp phí
+    public ArrayList<ArrayList<String>> getInforDonByTBPID(int  dtpid){
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        String sql = "select distinct tbl_don.D_ID as donid,DATE_FORMAT(tbl_don.D_Date,'%d-%m-%Y') as ngaynhap,"
+                            + " tbl_don.D_MDO as maonline," +
+                            "(select group_concat(`BDB_Name` separator ' & ')\n" +
+                            "as Result from tbl_benbaodam where tbl_benbaodam.D_ID = tbl_don.D_ID group by D_ID) as benbaodam,\n" +
+                            "(select tbl_lephi.LP_Price from tbl_lephi where tbl_lephi.LP_ID = tbl_don.LP_ID) as tongtien\n" +
+                            "from tbl_dondatp\n" +
+                            "inner join tbl_don on tbl_don.D_ID = tbl_dondatp.D_ID\n" +
+                            " where tbl_dondatp.DTP_ID = ?;";
+       // System.out.println(sql);
+       // System.out.println(sohieu);
+        connect = new DBConnect().dbConnect();
+        try {
+            pstm = connect.prepareStatement(sql);
+            pstm.setInt(1, dtpid);
+            rs = pstm.executeQuery();
+            int i=1;
+             while(rs.next()){
+                 ArrayList<String> dt = new ArrayList<>();
+                 String ngaynhap = rs.getString("ngaynhap");
+                 String maonline = rs.getString("maonline");
+                 String benbaodam = rs.getString("benbaodam");
+                 String tongtien = rs.getString("tongtien");
+                 dt.add(ngaynhap);dt.add(maonline);dt.add(benbaodam);dt.add(tongtien);
+                 data.add(dt);
+             }
+             
+        } catch (SQLException ex) {
+            Logger.getLogger(Thuphi.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            try {
+                new DBConnect().closeAll(connect, pstm, rs);
+            } catch (SQLException ex) {
+                Logger.getLogger(ThongKe.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return data;
     }
 }
