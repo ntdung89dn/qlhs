@@ -321,9 +321,11 @@
                     modal: true,
                     buttons: {
                       "Lưu file excel": function() {
+                          saveVanThu(true);
                         $( this ).dialog( "close" );
                       },
                       "Không lưu": function() {
+                          saveVanThu(false);
                         $( this ).dialog( "close" );
                       }
                     }
@@ -480,12 +482,13 @@
                                 $.ajax({
                                     type: "GET",
                                     url:"vanthu",
+                                    dataType: 'json',
                                     data:{"action":"insert","ngaygoi":daytime,"noinhan":noinhan,"sobuudien":sobuudien,
                                         "sobienlai":sobl,"ghichu":ghichu,"donid":idhs},
                                     success: function (data) {
-                                        $('#result_add').html(data);
+                                        $('#result_add').html(data.result);
                                         if(isSaveExcel){
-                                            
+                                            window.location = "vanthu?action=savevtexcel&vtid="+data.vtid+"&noinhan="+noinhan;
                                         }
                                         $('#div_loading').empty();
                                         vt_Search();
@@ -500,8 +503,6 @@
                     e.preventDefault();
                     $( "#dialog-save-excel" ).dialog( "open" );
                   //  alert('x');
-                    return false;
-                    
                 };
                 
                 var vt_Search = function(){

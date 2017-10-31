@@ -9,6 +9,9 @@ import com.ttdk.bean.CSGT;
 import com.ttdk.bean.VanThu;
 import com.ttdk.bean.VanThuCSGT;
 import com.ttdk.createFile.ExportExcelCSGT;
+import com.ttdk.createFile.ExportExcelVanThu;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -75,12 +78,24 @@ public class VanThuServlet extends HttpServlet {
             } catch (SQLException ex) {
                 Logger.getLogger(VanThuServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
+            String resultStr = "";
             if(vtid != 0){
-                response.getWriter().write("Nhập văn thư có mã bưu điện "+sobuudien+"  thành công");
+            //    response.getWriter().write();
+                resultStr = "Nhập văn thư có mã bưu điện "+sobuudien+"  thành công";
             }else{
-                response.getWriter().write("Nhập văn thư có mã bưu điện "+sobuudien+" không thành công");
+          //      response.getWriter().write("Nhập văn thư có mã bưu điện "+sobuudien+" không thành công");
+                resultStr = "Nhập văn thư có mã bưu điện "+sobuudien+" không thành công";
             }
-           
+           JSONObject obj = new JSONObject();
+            try {
+                obj.put("result",resultStr);
+                obj.put("vtid",vtid);
+            } catch (JSONException ex) {
+                Logger.getLogger(VanThuServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            String pagelist = obj.toString();
+          //  System.out.println(tbody);
+             response.getWriter().write(pagelist);
         }else if(action.equals("updatevanthu")){
             String ngaygoi = request.getParameter("ngaygoi");
             String noinhan = request.getParameter("noinhan");
@@ -527,6 +542,15 @@ public class VanThuServlet extends HttpServlet {
             }
             String pagelist = obj.toString();
              response.getWriter().write(pagelist);
+        }else if(action.equals("savevtexcel")){
+            int vtid  = Integer.parseInt(request.getParameter("vtid"));
+            String noinhan = request.getParameter("noinhan");
+            HSSFWorkbook workbook =  new ExportExcelVanThu().createExcelVTSave(vtid,noinhan);
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment; filename=donvanthuluu-"+noinhan+".xls");
+            OutputStream out = response.getOutputStream();
+            workbook.write(out);
+            out.close();
         }
     }
 

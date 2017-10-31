@@ -335,6 +335,9 @@ public class ExportExcelVanThu {
                 String maloainhan = new NhapDon().returnManhan(loaidk, manhan, loainhan,thoigian);
                 String donid = rs.getString("id");
                 String maonline = rs.getString("maonline");
+                if(maloainhan.equals("CE1700000BD")){
+                    maloainhan = "";
+                }
                 dt.add(maonline);dt.add(maloainhan);dt.add(donid);
                 data.add(dt);
             }
@@ -344,7 +347,7 @@ public class ExportExcelVanThu {
         return data;
     }
     // create excel after save van thu
-    public HSSFWorkbook createExcelVTSave(int vtid){
+    public HSSFWorkbook createExcelVTSave(int vtid,String noinhan){
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Danh sách đơn");
         Row rowHeader = sheet.createRow(0);
@@ -361,25 +364,29 @@ public class ExportExcelVanThu {
 
         Row rowTD = sheet.createRow(3);
         createCell(rowTD, 0,false, 3, 4, 1, 1, sheet,"Mã số bưu điện",true,workbook);
-        createCell(rowTD, 1,false, 4, 4,4, 4, sheet,"Số đơn Online",true,workbook);
-        createCell(rowTD, 2,false, 4, 4,4, 4, sheet,"Số CV",true,workbook);
-        createCell(rowTD, 3,false, 4, 4,4, 4, sheet,"Tổng số hồ sơ",true,workbook);
+        createCell(rowTD, 1,false, 3, 4, 1, 1, sheet,"Nơi nhận",true,workbook);
+        createCell(rowTD, 2,false, 4, 4,4, 4, sheet,"Số đơn Online",true,workbook);
+        createCell(rowTD, 3,false, 4, 4,4, 4, sheet,"Số CV",true,workbook);
+        createCell(rowTD, 4,false, 4, 4,4, 4, sheet,"Tổng số hồ sơ",true,workbook);
         int rownum = 4;
         ArrayList<String> vtinfor =  new VanThu().getInforVanThuById(vtid);
         ArrayList<ArrayList<String>> dt = getDataDonByVTid(vtid);
         String mabuudien = vtinfor.get(2);
         int totalRow = dt.size();
         Row rowContent = sheet.createRow(rownum);
-        createCell(rowContent, 0,true, rownum, (rownum+totalRow-1), 0, 0, sheet,mabuudien,false,workbook);
-        createCell(rowContent, 3,true, rownum, (rownum+totalRow-1), 3, 3, sheet,""+totalRow,false,workbook);
+        
         for(int i =0; i < totalRow;i++){
             int countRow = rownum+i;
             Row rowSub = sheet.createRow(countRow);
-            createCell(rowSub, 1,false, rownum, countRow, 1, 1, sheet,dt.get(i).get(0),false,workbook);
-            createCell(rowSub, 2,false, rownum, countRow, 1, 1, sheet,dt.get(i).get(1),false,workbook);
+            createCell(rowSub, 2,false, rownum, countRow, 1, 1, sheet,dt.get(i).get(0),false,workbook);
+            createCell(rowSub, 3,false, rownum, countRow, 1, 1, sheet,dt.get(i).get(1),false,workbook);
         }
+        createCell(rowContent, 0,true, rownum, (rownum+totalRow-1), 0, 0, sheet,mabuudien,false,workbook);
+        createCell(rowContent, 1,true, rownum, (rownum+totalRow-1), 1, 1, sheet,noinhan,false,workbook);
+        createCell(rowContent, 4,true, rownum, (rownum+totalRow-1), 4, 4, sheet,""+totalRow,false,workbook);
         return workbook;
     }
+    
     // create cell in excel
     void createCell(Row row,int cellposition,boolean merger,int frow,int srow,int fcol,int scol,HSSFSheet sheet,String cellValue,boolean setStyle, HSSFWorkbook workbook){
         Cell cell = row.createCell(cellposition);
