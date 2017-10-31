@@ -6,7 +6,9 @@
 package com.ttdk.createFile;
 
 import com.ttdk.bean.KhachhangBean;
+import com.ttdk.bean.NhapDon;
 import com.ttdk.bean.ThongKe;
+import com.ttdk.bean.VanThu;
 import com.ttdk.bean.VanThuBean;
 import com.ttdk.connect.DBConnect;
 import java.sql.Connection;
@@ -305,6 +307,80 @@ public class ExportExcelVanThu {
         
         return workbook;
     }
+    
+    // lấy dữ liệu đơn
+    public ArrayList<ArrayList<String>> getDataDonByVTid(int vtid){
+         ArrayList<ArrayList<String>> data = new ArrayList<>();
+        String sql = "select tbl_don.D_ID as id,concat(tbl_don.D_GioNhan,\":\",tbl_don.D_PhutNhan,\" \",DATE_FORMAT(tbl_don.D_Date,'%d-%m-%Y')) as thoigian,\n" +
+                        "(select tbl_loaidk.DK_Short from tbl_loaidk where tbl_loaidk.DK_ID = tbl_don.DK_ID) as loaidk,\n" +
+                        "tbl_don.D_manhan as manhan,\n" +
+                        "(select tbl_loainhan.LN_Short from tbl_loainhan where tbl_loainhan.LN_ID = tbl_don.LN_ID) as loainhan,\n" +
+                        "(select tbl_loaidon.LD_Des from tbl_loaidon where tbl_loaidon.LD_ID = tbl_don.LD_ID) as loaidon,"
+                + " tbl_don.D_MDO as maonline \n" +
+                        "from tbl_don\n" +
+                        "left join tbl_vtdon on tbl_vtdon.D_ID = tbl_don.D_ID\n" +
+                        "where tbl_vtdon.VT_ID = ?;";
+        System.out.println(sql);
+        connect = new DBConnect().dbConnect();
+        try {
+            pstm = connect.prepareStatement(sql);
+            pstm.setInt(1, vtid);
+            rs = pstm.executeQuery();
+            while(rs.next()){
+                ArrayList<String> dt = new ArrayList<>();
+                String thoigian = rs.getString("thoigian");
+                String manhan = rs.getString("manhan");
+                String loainhan = rs.getString("loainhan");
+                String loaidk = rs.getString("loaidk");
+                String maloainhan = new NhapDon().returnManhan(loaidk, manhan, loainhan,thoigian);
+                String donid = rs.getString("id");
+                String maonline = rs.getString("maonline");
+                dt.add(maonline);dt.add(maloainhan);dt.add(donid);
+                data.add(dt);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(VanThu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return data;
+    }
+    // create excel after save van thu
+    public HSSFWorkbook createExcelVTSave(int vtid){
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Danh sách đơn");
+        Row rowHeader = sheet.createRow(0);
+        createCell(rowHeader, 0,true, 0, 0, 0, 30, sheet,"Danh sách đơn",false,workbook);
+
+         Date date = new Date(); // your date
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH)+1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        Row rowNgay= sheet.createRow(1);
+        createCell(rowNgay, 0, true,1, 1, 0, 30, sheet,"Ngày "+day+"/"+month+"/"+year,false,workbook);
+
+        Row rowTD = sheet.createRow(3);
+        createCell(rowTD, 0,false, 3, 4, 1, 1, sheet,"Mã số bưu điện",true,workbook);
+        createCell(rowTD, 1,false, 4, 4,4, 4, sheet,"Số đơn Online",true,workbook);
+        createCell(rowTD, 2,false, 4, 4,4, 4, sheet,"Số CV",true,workbook);
+        createCell(rowTD, 3,false, 4, 4,4, 4, sheet,"Tổng số hồ sơ",true,workbook);
+        int rownum = 4;
+        ArrayList<String> vtinfor =  new VanThu().getInforVanThuById(vtid);
+        ArrayList<ArrayList<String>> dt = getDataDonByVTid(vtid);
+        String mabuudien = vtinfor.get(2);
+        int totalRow = dt.size();
+        Row rowContent = sheet.createRow(rownum);
+        createCell(rowContent, 0,true, rownum, (rownum+totalRow-1), 0, 0, sheet,mabuudien,false,workbook);
+        createCell(rowContent, 3,true, rownum, (rownum+totalRow-1), 3, 3, sheet,""+totalRow,false,workbook);
+        for(int i =0; i < totalRow;i++){
+            int countRow = rownum+i;
+            Row rowSub = sheet.createRow(countRow);
+            createCell(rowSub, 1,false, rownum, countRow, 1, 1, sheet,dt.get(i).get(0),false,workbook);
+            createCell(rowSub, 2,false, rownum, countRow, 1, 1, sheet,dt.get(i).get(1),false,workbook);
+        }
+        return workbook;
+    }
+    // create cell in excel
     void createCell(Row row,int cellposition,boolean merger,int frow,int srow,int fcol,int scol,HSSFSheet sheet,String cellValue,boolean setStyle, HSSFWorkbook workbook){
         Cell cell = row.createCell(cellposition);
         cell.setCellValue(cellValue);

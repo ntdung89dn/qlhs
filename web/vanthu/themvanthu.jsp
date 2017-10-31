@@ -286,7 +286,7 @@
             <ul class="pagination" id="ul_page" ></ul>
         </div>
         </div>
-                <!-- Modal -->
+                <!-- Modal  check ben nhan bao dam-->
             <div id="myModal" class="modal fade" role="dialog">
               <div class="modal-dialog">
 
@@ -305,10 +305,29 @@
                   </div>
                 </div>
               </div>
+                <!-- dialog confirm save excel -->
+                <div id="dialog-save-excel" title="Lưu excel file">
+                    <p>Bạn có muốn tạo file excel sau khi lưu văn thư ?</p>
+                  </div>
                 <script>
                     var donArr = [];
                 var idArr = [];
                 var _nhArr = [];
+                $( "#dialog-save-excel" ).dialog({
+                    autoOpen: false,
+                    resizable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                      "Lưu file excel": function() {
+                        $( this ).dialog( "close" );
+                      },
+                      "Không lưu": function() {
+                        $( this ).dialog( "close" );
+                      }
+                    }
+                  });
                 $( "#ngaygoi" ).datepicker({
                     dateFormat: 'dd-mm-yy',          
                     monthNamesShort: [ "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4",
@@ -437,7 +456,9 @@
                         }
                     });
                 };
-                var submit_Click = function(){
+                
+                // save van thu
+                function saveVanThu(isSaveExcel){
                     $('#result_add').html('');
                     var daytime = $( "#ngaygoi" ).datepicker().val();
                     console.log(daytime);
@@ -463,6 +484,9 @@
                                         "sobienlai":sobl,"ghichu":ghichu,"donid":idhs},
                                     success: function (data) {
                                         $('#result_add').html(data);
+                                        if(isSaveExcel){
+                                            
+                                        }
                                         $('#div_loading').empty();
                                         vt_Search();
                                         reset_Click();
@@ -470,6 +494,14 @@
                                 });
                             }
                     }
+                }
+                // submit add event
+                var submit_Click = function(e){
+                    e.preventDefault();
+                    $( "#dialog-save-excel" ).dialog( "open" );
+                  //  alert('x');
+                    return false;
+                    
                 };
                 
                 var vt_Search = function(){
